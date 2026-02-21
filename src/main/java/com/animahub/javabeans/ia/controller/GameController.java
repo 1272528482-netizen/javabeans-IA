@@ -5,6 +5,7 @@ import com.animahub.javabeans.ia.dto.AvaliacaoDTO;
 import com.animahub.javabeans.ia.dto.AcaoJogadorDTO;
 import com.animahub.javabeans.ia.dto.DiagnosticoDTO;
 import com.animahub.javabeans.ia.engine.GameEngine;
+import com.animahub.javabeans.ia.repository.SessaoRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,9 +18,11 @@ import java.time.LocalDateTime;
 public class GameController {
     
     private final GameEngine gameEngine;
+    private final SessaoRepository sessaoRepository; // Injetando o Banco de Dados
 
-    public GameController(GameEngine gameEngine) {
+    public GameController(GameEngine gameEngine, SessaoRepository sessaoRepository) {
         this.gameEngine = gameEngine;
+        this.sessaoRepository = sessaoRepository;
     }
     
     @GetMapping("/health")
@@ -37,16 +40,25 @@ public class GameController {
         return gameEngine.processarTurno(acao.getSessionId(), acao.getResposta());
     }
 
-    // NOVO: Endpoint de diagnóstico para o Front-end
     @GetMapping("/diagnostico")
     public DiagnosticoDTO diagnostico() {
-        // Verifica de forma segura se a chave foi injetada no ambiente, sem expor o valor
+        // Verifica a IA
         String apiKey = System.getenv("DEEPSEEK_API_KEY");
         boolean iaPronta = (apiKey != null && !apiKey.isBlank());
+        
+        // Verifica o Banco de Dados (H2)
+        boolean dbPronto;
+        try {
+            sessaoRepository.count(); // Tenta contar as linhas para testar a conexão
+            dbPronto = true;
+        } catch (Exception e) {
+            dbPronto = false;
+        }
         
         return new DiagnosticoDTO(
             "ONLINE", 
             iaPronta, 
+            dbPronto,
             LocalDateTime.now().toString()
         );
     }
