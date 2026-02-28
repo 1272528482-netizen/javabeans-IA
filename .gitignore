@@ -1,4 +1,4 @@
-﻿### Java ###
+### Java ###
 *.class
 *.log
 *.jar
@@ -80,4 +80,4 @@ application-local.yml
 application-local.properties
 .env
 config.sh
-.env
+config.ps1
