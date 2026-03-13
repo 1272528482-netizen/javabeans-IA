@@ -1,16 +1,12 @@
 package com.animahub.javabeans.ia.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DeepseekConfig {
 
-    @Value("${deepseek.endpoint:}")
-    private String endpoint;
-
-    @Value("${deepseek.key:}")
-    private String apiKey;
+    private String endpoint = "https://api.deepseek.com/v1";
+    private String apiKey = "sk-fed2ac352da0422a9f512dcd740ec6a7";
 
     public String getEndpoint() {
         return endpoint;

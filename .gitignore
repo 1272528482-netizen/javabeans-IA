@@ -81,6 +81,7 @@ application-local.properties
 .env
 config.sh
 config.ps1
+DeepseekConfig.java
 
 ### Meus Arquivos Temporarios ###
 cookies.txt

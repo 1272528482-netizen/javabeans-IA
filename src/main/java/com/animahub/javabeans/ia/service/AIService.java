@@ -1,6 +1,7 @@
 package com.animahub.javabeans.ia.service;
 
 import com.animahub.javabeans.ia.config.DeepseekConfig;
+import com.animahub.javabeans.ia.dto.AvaliacaoDTO;
 import com.animahub.javabeans.ia.model.Ingrediente;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,32 +14,50 @@ import java.util.Map;
 public class AIService {
 
     private final WebClient webClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public AIService(DeepseekConfig config, WebClient.Builder builder) {
+    public AIService(DeepseekConfig config, WebClient.Builder builder, ObjectMapper objectMapper) {
         this.webClient = builder
                 .baseUrl(config.getEndpoint())
                 .defaultHeader("Authorization", "Bearer " + config.getApiKey())
                 .defaultHeader("Content-Type", "application/json")
                 .build();
+        this.objectMapper = objectMapper;
     }
 
-    public String avaliarResposta(String promptJogador) {
+    public AvaliacaoDTO avaliarResposta(String promptJogador) {
         Map<String, Object> body = Map.of(
                 "model", "deepseek-chat",
                 "messages", List.of(
-                        Map.of("role", "system", "content", "Você é um avaliador de soft skills... JSON: {\"xpGanho\":10-50, \"feedbackEducativo\":\"...\", \"personaQuebrada\":false, \"cenarioConcluido\":false}"),
+                        Map.of("role", "system", "content", "Você é um avaliador de soft skills. RESPONDA SEMPRE APENAS COM UM JSON VÁLIDO NO FORMATO: {\"xpGanho\":<numero>, \"feedbackEducativo\":\"texto\", \"personaQuebrada\":<true|false>, \"cenarioConcluido\":<true|false>}"),
                         Map.of("role", "user", "content", promptJogador)
                 ),
                 "response_format", Map.of("type", "json_object")
         );
 
-        return webClient.post()
-                .uri("/chat/completions")
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        try {
+            String rawResponse = webClient.post()
+                    .uri("/chat/completions")
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            JsonNode root = objectMapper.readTree(rawResponse);
+            String conteudoIA = root.path("choices").get(0).path("message").path("content").asText();
+
+            // Limpa possíveis blocos de código Markdown que a IA possa incluir.
+            String jsonLimpo = conteudoIA
+                    .replace("```json", "")
+                    .replace("```", "")
+                    .trim();
+
+            return objectMapper.readValue(jsonLimpo, AvaliacaoDTO.class);
+
+        } catch (Exception e) {
+            System.err.println("Erro ao validar JSON da IA: " + e.getMessage());
+            return new AvaliacaoDTO(0, "Resposta inválida da IA. Tente novamente.", false, false);
+        }
     }
 
     public String gerarFeedbackBarista(String bebida, List<Ingrediente> escolhido, List<Ingrediente> esperado, boolean acertou) {

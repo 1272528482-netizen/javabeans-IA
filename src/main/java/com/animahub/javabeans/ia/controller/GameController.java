@@ -1,8 +1,11 @@
 package com.animahub.javabeans.ia.controller;
 
+import com.animahub.javabeans.ia.dto.AcaoJogadorDTO;
+import com.animahub.javabeans.ia.dto.CenarioDTO;
 import com.animahub.javabeans.ia.dto.DiagnosticoDTO;
 import com.animahub.javabeans.ia.dto.PrepararCafeRequest;
 import com.animahub.javabeans.ia.dto.ResultadoPreparar;
+import com.animahub.javabeans.ia.model.Receita;
 import com.animahub.javabeans.ia.service.AIService;
 import com.animahub.javabeans.ia.service.GameService;
 import jakarta.servlet.http.HttpSession;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/game")
@@ -35,6 +39,29 @@ public class GameController {
     @GetMapping("/cenario")
     public ResponseEntity<String> getCenario(HttpSession session) {
         return ResponseEntity.ok(gameService.getProximoCliente(session).nomeBebida());
+    }
+
+    @PostMapping("/processar-fala")
+    public ResponseEntity<CenarioDTO> processarFala(
+            @RequestBody AcaoJogadorDTO acao,
+            HttpSession session) {
+
+        // Valida com a IA se a fala do jogador faz sentido no cenário atual.
+        // Não retornamos a avaliação diretamente; apenas garantimos que a IA foi consultada.
+        try {
+            aiService.avaliarResposta(acao.getResposta());
+        } catch (Exception e) {
+            System.err.println("Erro ao validar fala do jogador: " + e.getMessage());
+        }
+
+        // Retorna o cenário atualizado com a bebida e os ingredientes esperados
+        Receita receita = gameService.getProximoCliente(session);
+        CenarioDTO cenario = new CenarioDTO();
+        cenario.setNomeBebida(receita.nomeBebida());
+        cenario.setIngredientesEsperados(
+                receita.ingredientesEsperados().stream().map(Enum::name).collect(Collectors.toList())
+        );
+        return ResponseEntity.ok(cenario);
     }
 
     @PostMapping("/preparar-cafe")
