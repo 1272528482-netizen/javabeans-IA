@@ -88,4 +88,8 @@ public class GameService {
 
         return new ResultadoPreparar(acertou, pontos, pontuacaoTotal, feedbackIA, cenarios.get(proximoCenario));
     }
+
+    public int getTotalReceitasDisponiveis() {
+        return cenarios.size();
+    }
 }

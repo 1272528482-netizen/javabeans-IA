@@ -1,24 +1,20 @@
 package com.animahub.javabeans.ia.dto;
 
-public class AvaliacaoDTO {
+public class AvaliacaoTextoDTO {
     private String falaDoCliente;
-    private int xpGanho;
     private String feedbackEducativo;
     private boolean cenarioConcluido;
 
-    public AvaliacaoDTO() {}
+    public AvaliacaoTextoDTO() {}
 
-    public AvaliacaoDTO(String falaDoCliente, int xpGanho, String feedbackEducativo, boolean cenarioConcluido) {
+    public AvaliacaoTextoDTO(String falaDoCliente, String feedbackEducativo, boolean cenarioConcluido) {
         this.falaDoCliente = falaDoCliente;
-        this.xpGanho = xpGanho;
         this.feedbackEducativo = feedbackEducativo;
         this.cenarioConcluido = cenarioConcluido;
     }
 
     public String getFalaDoCliente() { return falaDoCliente; }
     public void setFalaDoCliente(String falaDoCliente) { this.falaDoCliente = falaDoCliente; }
-    public int getXpGanho() { return xpGanho; }
-    public void setXpGanho(int xpGanho) { this.xpGanho = xpGanho; }
     public String getFeedbackEducativo() { return feedbackEducativo; }
     public void setFeedbackEducativo(String feedbackEducativo) { this.feedbackEducativo = feedbackEducativo; }
     public boolean isCenarioConcluido() { return cenarioConcluido; }

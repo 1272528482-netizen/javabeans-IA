@@ -59,4 +59,18 @@ public class SessionService {
     public Optional<Sessao> buscarSessao(String sessionId) {
         return sessaoRepository.findBySessionId(sessionId);
     }
+
+    /**
+     * Conta o total de sessões no repositório
+     */
+    public long contarSessoes() {
+        return sessaoRepository.count();
+    }
+
+    /**
+     * Calcula o XP total acumulado em todas as sessões
+     */
+    public int calcularXpTotal() {
+        return sessaoRepository.findAll().stream().mapToInt(s -> s.getXpTotal()).sum();
+    }
 }

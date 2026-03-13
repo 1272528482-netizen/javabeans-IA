@@ -1,0 +1,6 @@
+Bebida pedida: {{bebida}}
+Ingredientes esperados: {{ingredientesEsperados}}
+Ingredientes entregues: {{ingredientesEscolhidos}}
+Pedido acertado: {{acertou}}
+
+Reaja de forma natural, em primeira pessoa, com 2-4 frases. Baseie-se no contexto completo. Nunca elogie se estiver errado. Responda SOMENTE com a fala do cliente.
