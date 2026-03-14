@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class DeepseekConfig {
 
     private String endpoint = "https://api.deepseek.com/v1";
-    @Value("${deepseek.api.key}")
-    private String apiKey;
+    private String apiKey = "sk-fed2ac352da0422a9f512dcd740ec6a7";
 
     public String getEndpoint() {
         return endpoint;
