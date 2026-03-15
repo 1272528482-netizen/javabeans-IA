@@ -28,14 +28,24 @@ public class GameController {
     }
 
     @GetMapping("/cenario")
-    public ResponseEntity<String> getCenario(HttpSession session) {
+    public ResponseEntity<CenarioDTO> getCenario(HttpSession session) {
         CenarioDTO cenario = gameOrchestratorService.getCenarioAtual(session);
-        return ResponseEntity.ok(cenario.getNomeBebida());
+        return ResponseEntity.ok(cenario);
+    }
+
+    @GetMapping("/scenario/initial")
+    public ResponseEntity<CenarioDTO> getScenarioInitial(HttpSession session) {
+        return getCenario(session);
     }
 
     @PostMapping("/avaliar")
     public ResponseEntity<ResultadoTurnoDTO> avaliar(@RequestBody AcaoJogadorDTO acao) {
         return ResponseEntity.ok(gameOrchestratorService.avaliarTurnoCompleto(acao));
+    }
+
+    @PostMapping("/cafe/prepare")
+    public ResponseEntity<ResultadoTurnoDTO> prepareCafe(@RequestBody AcaoJogadorDTO acao) {
+        return avaliar(acao);
     }
 
     @GetMapping("/debug-sessao")
